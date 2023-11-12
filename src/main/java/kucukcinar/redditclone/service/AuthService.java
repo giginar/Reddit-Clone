@@ -1,6 +1,7 @@
 package kucukcinar.redditclone.service;
 
 import kucukcinar.redditclone.dto.RegisterRequest;
+import kucukcinar.redditclone.exceptions.SpringRedditException;
 import kucukcinar.redditclone.model.NotificationEmail;
 import kucukcinar.redditclone.model.User;
 import kucukcinar.redditclone.model.VerificationToken;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -50,5 +52,19 @@ public class AuthService {
 
         verificationTokenRepository.save(verificationToken);
         return token;
+    }
+
+    public void verifyAccount(String token) {
+        Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
+        verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token"));
+        fetchUserAndEnable(verificationToken.get());
+    }
+
+    @Transactional
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User nor found with name - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 }
