@@ -1,20 +1,17 @@
-import {Component, OnInit} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {FormControl, FormGroup, Validators} from "@angular/forms";
-import {AuthService} from "../shared/auth.service";
-import {ActivatedRoute, Router} from "@angular/router";
-import {LoginRequestPayload} from "./login-request.payload";
-import {throwError} from "rxjs";
+import { Component, OnInit } from '@angular/core';
+import { FormGroup, FormControl, Validators } from '@angular/forms';
+import { LoginRequestPayload } from './login-request.payload';
+import { AuthService } from '../shared/auth.service';
+import { Router, ActivatedRoute } from '@angular/router';
+import { ToastrService } from 'ngx-toastr';
+import { throwError } from 'rxjs';
 
 @Component({
   selector: 'app-login',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './login.component.html',
-  styleUrl: './login.component.css'
+  styleUrls: ['./login.component.css']
 })
-export class LoginComponent implements OnInit{
-
+export class LoginComponent implements OnInit {
 
   loginForm: FormGroup;
   loginRequestPayload: LoginRequestPayload;
@@ -22,7 +19,7 @@ export class LoginComponent implements OnInit{
   isError: boolean;
 
   constructor(private authService: AuthService, private activatedRoute: ActivatedRoute,
-              private router: Router) {
+    private router: Router, private toastr: ToastrService) {
     this.loginRequestPayload = {
       username: '',
       password: ''
@@ -38,6 +35,7 @@ export class LoginComponent implements OnInit{
     this.activatedRoute.queryParams
       .subscribe(params => {
         if (params.registered !== undefined && params.registered === 'true') {
+          this.toastr.success('Signup Successful');
           this.registerSuccessMessage = 'Please Check your inbox for activation email '
             + 'activate your account before you Login!';
         }
@@ -45,8 +43,8 @@ export class LoginComponent implements OnInit{
   }
 
   login() {
-    this.loginRequestPayload.username = this.loginForm.get('username')?.value;
-    this.loginRequestPayload.password = this.loginForm.get('password')?.value;
+    this.loginRequestPayload.username = this.loginForm.get('username').value;
+    this.loginRequestPayload.password = this.loginForm.get('password').value;
 
     this.authService.login(this.loginRequestPayload).subscribe(data => {
       this.isError = false;
