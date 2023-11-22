@@ -1,13 +1,20 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Input } from '@angular/core';
+import { PostModel } from '../post-model';
+import { faComments } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-post-title',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './post-title.component.html',
-  styleUrl: './post-title.component.css'
+  styleUrls: ['./post-title.component.css']
 })
-export class PostTitleComponent {
+export class PostTitleComponent implements OnInit {
+
+  @Input() data: Array<PostModel>;
+  faComments = faComments;
+
+  constructor() { }
+
+  ngOnInit(): void {
+  }
 
 }

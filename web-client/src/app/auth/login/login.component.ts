@@ -13,10 +13,10 @@ import { throwError } from 'rxjs';
 })
 export class LoginComponent implements OnInit {
 
-  loginForm: FormGroup;
+  loginForm!: FormGroup;
   loginRequestPayload: LoginRequestPayload;
-  registerSuccessMessage: string;
-  isError: boolean;
+  registerSuccessMessage!: string;
+  isError!: boolean;
 
   constructor(private authService: AuthService, private activatedRoute: ActivatedRoute,
     private router: Router, private toastr: ToastrService) {
@@ -34,7 +34,7 @@ export class LoginComponent implements OnInit {
 
     this.activatedRoute.queryParams
       .subscribe(params => {
-        if (params.registered !== undefined && params.registered === 'true') {
+        if (params['registered'] !== undefined && params['registered'] === 'true') {
           this.toastr.success('Signup Successful');
           this.registerSuccessMessage = 'Please Check your inbox for activation email '
             + 'activate your account before you Login!';
@@ -43,8 +43,8 @@ export class LoginComponent implements OnInit {
   }
 
   login() {
-    this.loginRequestPayload.username = this.loginForm.get('username').value;
-    this.loginRequestPayload.password = this.loginForm.get('password').value;
+    this.loginRequestPayload.username = this.loginForm.get('username')?.value;
+    this.loginRequestPayload.password = this.loginForm.get('password')?.value;
 
     this.authService.login(this.loginRequestPayload).subscribe(data => {
       this.isError = false;

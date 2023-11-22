@@ -1,13 +1,23 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, Input } from '@angular/core';
+import { PostModel } from '../post-model';
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-vote-button',
-  standalone: true,
-  imports: [CommonModule],
   templateUrl: './vote-button.component.html',
-  styleUrl: './vote-button.component.css'
+  styleUrls: ['./vote-button.component.css']
 })
-export class VoteButtonComponent {
+export class VoteButtonComponent implements OnInit {
+
+  @Input() post: PostModel;
+  faArrowUp = faArrowUp;
+  faArrowDown = faArrowDown;
+
+  constructor() {
+  }
+
+  ngOnInit() {
+
+  }
 
 }
