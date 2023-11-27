@@ -12,7 +12,6 @@ import kucukcinar.redditclone.repository.PostRepository;
 import kucukcinar.redditclone.repository.SubredditRepository;
 import kucukcinar.redditclone.repository.UserRepository;
 import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +22,6 @@ import static java.util.stream.Collectors.toList;
 
 @Service
 @AllArgsConstructor
-@Slf4j
 @Transactional
 public class PostService {
 
