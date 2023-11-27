@@ -9,7 +9,8 @@ import { faComments } from '@fortawesome/free-solid-svg-icons';
 })
 export class PostTitleComponent implements OnInit {
 
-  @Input() data: Array<PostModel>;
+  @Input()
+  data: Array<PostModel> = [];
   faComments = faComments;
 
   constructor() { }
