@@ -20,8 +20,10 @@ import { CreateSubredditComponent } from './subreddit/create-subreddit/create-su
 import { CreatePostComponent } from './post/create-post/create-post.component';
 import { ListSubredditsComponent } from './subreddit/list-subreddits/list-subreddits.component';
 import { EditorModule } from '@tinymce/tinymce-angular';
-import { TokenInterceptor } from 'token-intercepter';
+import { ViewPostComponent } from './post/view-post/view-post.component';
+import { NgbModule } from '@ng-bootstrap/ng-bootstrap';
 import { PostTitleComponent } from './shared/post-title/post-title.component';
+import { TokenInterceptor } from 'token-intercepter';
 
 
 @NgModule({
@@ -37,7 +39,8 @@ import { PostTitleComponent } from './shared/post-title/post-title.component';
     SubredditSideBarComponent,
     CreateSubredditComponent,
     CreatePostComponent,
-    ListSubredditsComponent
+    ListSubredditsComponent,
+    ViewPostComponent
   ],
   imports: [
     BrowserModule,
@@ -48,7 +51,8 @@ import { PostTitleComponent } from './shared/post-title/post-title.component';
     BrowserAnimationsModule,
     ToastrModule.forRoot(),
     FontAwesomeModule,
-    EditorModule
+    EditorModule,
+    NgbModule
   ],
   providers: [
     {
