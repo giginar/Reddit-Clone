@@ -29,8 +29,8 @@ import java.util.UUID;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class AuthService {
-
 
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
@@ -40,8 +40,7 @@ public class AuthService {
     private final JwtProvider jwtProvider;
     private final RefreshTokenService refreshTokenService;
 
-    @Transactional
-    public void signup(RegisterRequest registerRequest){
+    public void signup(RegisterRequest registerRequest) {
         User user = new User();
         user.setUsername(registerRequest.getUsername());
         user.setEmail(registerRequest.getEmail());
@@ -52,10 +51,25 @@ public class AuthService {
         userRepository.save(user);
 
         String token = generateVerificationToken(user);
-        mailService.sendMail(new NotificationEmail("Please activate your account",
+        mailService.sendMail(new NotificationEmail("Please Activate your Account",
                 user.getEmail(), "Thank you for signing up to Spring Reddit, " +
-                "please click on the below url to activate your account: " +
+                "please click on the below url to activate your account : " +
                 "http://localhost:8080/api/auth/accountVerification/" + token));
+    }
+
+    @Transactional(readOnly = true)
+    public User getCurrentUser() {
+        org.springframework.security.core.userdetails.User principal = (org.springframework.security.core.userdetails.User) SecurityContextHolder.
+                getContext().getAuthentication().getPrincipal();
+        return userRepository.findByUsername(principal.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getUsername()));
+    }
+
+    private void fetchUserAndEnable(VerificationToken verificationToken) {
+        String username = verificationToken.getUser().getUsername();
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User not found with name - " + username));
+        user.setEnabled(true);
+        userRepository.save(user);
     }
 
     private String generateVerificationToken(User user) {
@@ -70,16 +84,7 @@ public class AuthService {
 
     public void verifyAccount(String token) {
         Optional<VerificationToken> verificationToken = verificationTokenRepository.findByToken(token);
-        verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token"));
-        fetchUserAndEnable(verificationToken.get());
-    }
-
-    @Transactional
-    private void fetchUserAndEnable(VerificationToken verificationToken) {
-        String username = verificationToken.getUser().getUsername();
-        User user = userRepository.findByUsername(username).orElseThrow(() -> new SpringRedditException("User nor found with name - " + username));
-        user.setEnabled(true);
-        userRepository.save(user);
+        fetchUserAndEnable(verificationToken.orElseThrow(() -> new SpringRedditException("Invalid Token")));
     }
 
     public AuthenticationResponse login(LoginRequest loginRequest) {
@@ -95,19 +100,6 @@ public class AuthService {
                 .build();
     }
 
-    public boolean isLoggedIn() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
-    }
-
-    @Transactional(readOnly = true)
-    public User getCurrentUser() {
-        Jwt principal = (Jwt) SecurityContextHolder.
-                getContext().getAuthentication().getPrincipal();
-        return userRepository.findByUsername(principal.getSubject())
-                .orElseThrow(() -> new UsernameNotFoundException("User name not found - " + principal.getSubject()));
-    }
-
     public AuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
         refreshTokenService.validateRefreshToken(refreshTokenRequest.getRefreshToken());
         String token = jwtProvider.generateTokenWithUserName(refreshTokenRequest.getUsername());
@@ -117,5 +109,10 @@ public class AuthService {
                 .expiresAt(Instant.now().plusMillis(jwtProvider.getJwtExpirationInMillis()))
                 .username(refreshTokenRequest.getUsername())
                 .build();
+    }
+
+    public boolean isLoggedIn() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return !(authentication instanceof AnonymousAuthenticationToken) && authentication.isAuthenticated();
     }
 }
